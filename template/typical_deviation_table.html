@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css')}}" type="text/css">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+<body>
+    <!--{{url_for('typical_deviation_table')}}-->
+        <form action="javascript:void(0)" method="post" id="formTable">
+            <div class="container-table">
+                <table class="table">
+                <thead>
+                    <th>x<sub>i</sub></th>
+                    <th>f<sub>i</sub></th>
+            
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="number"  min="1" id="x_i"></td>
+                        <td><input type="number"  min="1" id="f_i"></td>
+                    </tr>
+                    <tr>
+                        
+                        <td><input type="number"  min="1" id="x_i"></td>
+                        <td><input type="number"  min="1" id="f_i"></td>
+                    </tr>
+                    <tr>
+                        
+                        <td><input type="number"  min="1" id="x_i"></td>
+                        <td><input type="number"  min="1" id="f_i"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="number"  min="1" id="x_i"></td>
+                        <td><input type="number"  min="1" id="f_i"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="number"  min="1" id="x_i"></td>
+                        <td><input type="number"  min="1" id="f_i"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="number"  min="1" id="x_i"></td>
+                        <td><input type="number"  min="1" id="f_i"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="number"  min="1" id="x_i"></td>
+                        <td><input type="number"  min="1" id="f_i"></td>
+                    </tr>
+                </tbody>
+                </table>
+                <button type="submit">Procesar</button>
+        </form>
+   <p id="can"></p>
+</div>
+</body>
+<script>
+    $(document).ready(function($){
+        $("#formTable").submit(function(e){
+            var arrayX_I = [];
+            var arrayF_I = [];
+            var ban = true;
+            $("input[id=x_i]",this).each(function(){
+                arrayX_I.push($(this).val());
+                if(String($(this).val())==""&&ban) ban = false;
+            });
+            $("input[id=f_i]",this).each(function(){
+                arrayF_I.push($(this).val());
+                if(String($(this).val())==""&&ban) ban = false;
+            });
+            if(ban){
+                data = {res:{
+                    x_i: arrayX_I,
+                    f_i: arrayF_I
+                }}
+                console.log(data)
+                $.ajax({
+                    type: "POST",
+                    cache:false,
+                    url: "{{url_for('typical_deviation_table')}}",
+                    data: JSON.stringify(data),
+                    contentType:"application/json",
+                    success: function(data){
+                        console.log(data['table_result'][0])
+                        dataResult(data['table_result'][0]);
+                        //window.location.href = "/home/statistics/typical_deviation_table/result="+data;
+                    },
+                    error: function(jqXHR,a,b) {
+                        alert("error: " + jqXHR.status);
+                        console.log(jqXHR,a,b);
+                    }
+                });
+            }else{
+                alert("Ingesa todos los campos para segir");
+            }
+            
+            //console.log(data);
+        });
+    function dataResult(data){
+            con = " ";
+            let mayor = data.reduce((total, val) => val.length>total?val.length:total,0);
+            for(let i = 0;i<mayor; i++){
+                con = con+"<tr>"
+                for(let j = 0; j<data.length; j++){
+                    if(data[j][i])
+                        con = con +"<td>"+data[j][i]+"</td>";
+                    else 
+                        con = con + "<td></td>";
+                }
+                con = con + "</tr>";
+            }
+            con ="<table class='table'>"
+                +"<thead>"
+                +    "<th>x<sub>i</sub></th>"
+                +    "<th>f<sub>i</sub></th>"
+                +    "<th>N<sub>i</sub></th>"
+                +    "<th>s<sub>i</sub>*f<sub>i</sub></th>"
+                +   "<th>s<sup>2</sup><sub>i</sub>*f<sub>i</sub></th>"
+                +"</thead>"
+                +"<tbody>"
+                   + con +
+                +"</tbody>"
+                +"</table>";
+            document.getElementById('can').innerHTML=""+con;  
+    }
+    });
+</script>
+</html>
